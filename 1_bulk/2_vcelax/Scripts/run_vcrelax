@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+source ../../ENVIRONMENT_VARIABLES
+echo "BIN_DIR:" $BIN_DIR
+echo "PSEUDO_DIR:" $PSEUDO_DIR
+echo "TMP_DIR:" $TMP_DIR
+echo "Parallel command:" $RUN_COMMAND
+echo "Started at: " `date`
+
+SAVE=GaN_Etot_vs_vc-relax-script.dat
+echo -e "# cutoff(Ry) \t a(A) \t\t c(A) \t\t c/a \t\t energy(Ry)" > $SAVE
+
+for cutoff in 40 50 60 70 80 90 100; do
+
+IN=GaN_script.vc-relax.in
+OUT=GaN_script.vc-relax.out_${cutoff}Ry
+
+cat > $IN << EOF
+
+&CONTROL
+    calculation       = 'vc-relax'
+    restart_mode      = 'from_scratch'
+    prefix            = 'GaN'
+    tstress           = .true.
+    tprnfor           = .true.
+    pseudo_dir        = "$PSEUDO_DIR"
+    outdir            = "$TMP_DIR"
+    verbosity         = 'high'
+    disk_io = 'minimal'
+    wf_collect        = .true.
+/
+&SYSTEM
+  ibrav     = 4,
+  A = 3.180,
+  C = 5.180,
+  nat       = 4,
+  ntyp      = 2,
+  ecutwfc   = $cutoff,
+  ecutrho   = $((cutoff*10)),
+  nbnd      = 22,
+/
+&ELECTRONS
+  conv_thr    = 1.D-8,
+  mixing_beta = 0.7D0	,
+/
+&IONS
+/
+
+&CELL
+    cell_dynamics = 'bfgs',
+    cell_dofree = 'ibrav'
+/
+
+ATOMIC_SPECIES
+ Ga  69.723  Ga.pbe-dn-kjpaw_psl.1.0.0.UPF
+ N    14.007 N.pbe-n-kjpaw_psl.1.0.0.UPF
+ATOMIC_POSITIONS {crystal}
+ Ga 0.333333333 0.666666666 0.00 0 0 0
+ Ga 0.666666666 0.333333333 0.50 0 0 0
+ N 0.333333333 0.666666666 0.375 0 0 1
+ N 0.666666666 0.333333333 0.875 0 0 1
+K_POINTS {automatic}
+6 6 4 1 1 1
+EOF
+
+echo -e "\tStart: " `date`
+COMMAND="  $RUN_COMMAND $BIN_DIR/pw.x"
+echo -e "\t\t$COMMAND < $IN > $OUT"
+$COMMAND < $IN > $OUT
+echo -e "\tEnd: " `date`
+
+#a=$(grep -F "celldm(1) = " $OUT | tail -n 1 | awk '{print $3*0.52917721092}' )
+#ca=$(grep -F "celldm(3) = " $OUT | tail -n 1 | awk '{print $3}' )
+#c=$(awk -v x="$a" -v y="$ca" 'BEGIN {print x*y}' )
+
+#ENERGY=$(grep -F "Final enthalpy" $OUTVC | tail -n 1 | awk '{print $4}')
+
+#echo -e "$cutoff\t\t$a\t\t$c\t\t$ca\t\t$ENERGY" #>> $SAVE
+
+done
+echo "Run completed at: " `date`
+#alat=$(awk '/CELL_PARAMETERS/{gsub(/[()=]/," "); alat=$3; getline; scale=$1} END{printf "%.8f", alat*scale*0.52917721092}' $OUTVC )

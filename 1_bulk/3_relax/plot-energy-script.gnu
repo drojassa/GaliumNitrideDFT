@@ -1,0 +1,29 @@
+#!/usr/bin/gnuplot
+
+reset
+
+set term qt enhanced size 800,600
+set out
+
+set pm3d map
+set palette rgbformulae 33,13,10 
+
+
+set title "Energy Map (Ry)"
+set xlabel "a (A)"
+set ylabel "c (A)"
+set cblabel "Total Energy (Ry)"
+
+
+# set xrange [3.15:3.31]
+# set yrange [5.09:5.41]
+
+
+splot 'GaN_Etot_vs_a_vs_c-script.dat_70Ry' using 1:2:3 notitle
+
+pause -1 "Press Enter in the terminal to save the PNG image..."
+
+
+set term pngcairo enhanced size 900,700
+set output "GaN_Etot_vs_a_vs_c-script.dat_70Ry.png"
+replot

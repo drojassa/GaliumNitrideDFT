@@ -1,0 +1,7 @@
+ &dos
+   outdir='./tmp'
+   prefix='GaN'
+  fildos='GaN.dos.dat',
+      bz_sum='tetrahedra'
+Emin=-10.0, Emax=20.0, DeltaE=0.1
+/

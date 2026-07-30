@@ -1,0 +1,69 @@
+#!/bin/bash
+
+SAVE="GaN_Etot_vs_vc-relax-script.dat"
+
+# Create or clear the output file and write the header
+echo -e "# cutoff(Ry) \t a(A) \t\t c(A) \t\t c/a \t\t energy(Ry)" > "$SAVE"
+
+# Loop to process every file matching the pattern
+for OUT in *script*.out*; do
+    # Ensure the file actually exists (prevents errors if no match is found)
+    [ -f "$OUT" ] || continue
+
+    echo "Processing: $OUT"
+
+    # 1. Extract the kinetic energy cutoff (ecutwfc) from the output file
+    # Typically looks like: "kinetic-energy cutoff     =      40.0000 Ry"
+    cutoff=$(grep -i "kinetic-energy cutoff" "$OUT" | head -n 1 | awk '{print $4}')
+    
+    # Fallback if the cutoff line is missing
+    if [ -z "$cutoff" ]; then
+        cutoff="NaN"
+    fi
+
+    # 2. Extract lattice parameters from the last converged or available step
+    celldm1=$(grep -F "celldm(1) =" "$OUT" | tail -n 1 | awk '{print $3}')
+    celldm3=$(grep -F "celldm(3) =" "$OUT" | tail -n 1 | awk '{print $3}')
+
+    # If the file is empty or missing these parameters, skip it
+    if [ -z "$celldm1" ] || [ -z "$celldm3" ]; then
+        echo "Warning: No lattice parameters found in $OUT. Skipping..."
+        continue
+    fi
+
+    # Calculate 'a' in Angstroms, 'ca' (c/a ratio), and 'c' in Angstroms
+    a=$(awk -v c1="$celldm1" 'BEGIN {print c1 * 0.52917721092}')
+    ca=$celldm3
+    c=$(awk -v x="$a" -v y="$ca" 'BEGIN {print x * y}')
+
+    # 3. Extract Energy / Enthalpy
+    # Try to find "Final enthalpy" first
+    ENERGY=$(grep -F "Final enthalpy" "$OUT" | tail -n 1 | awk '{print $4}')
+
+    # Fallback: If the vc-relax was interrupted, grab the last total energy step '!'
+    if [ -z "$ENERGY" ]; then
+        ENERGY=$(grep -F "!" "$OUT" | tail -n 1 | awk '{print $5}')
+        NOTE="\t(Used ! Etot)"
+    else
+        NOTE=""
+    fi
+
+    # If no energy value is found at all, set to NaN
+    if [ -z "$ENERGY" ]; then
+        ENERGY="NaN"
+    fi
+
+    # 4. Write the formatted data into the SAVE file using tab separators
+    printf "%-12s\t%-12.6f\t%-12.6f\t%-12.6f\t%-16s%s\n" "$cutoff" "$a" "$c" "$ca" "$ENERGY" "$NOTE" >> "$SAVE"
+
+done
+
+# Optional: Numerically sort the final file by the first column (cutoff)
+# while keeping the header intact. This is highly recommended for clean Gnuplot lines.
+head -n 1 "$SAVE" > "${SAVE}.tmp"
+tail -n +2 "$SAVE" | sort -n >> "${SAVE}.tmp"
+mv "${SAVE}.tmp" "$SAVE"
+
+echo "--------------------------------------------------"
+echo "Done! Data has been successfully sorted and saved to: $SAVE"
+cat "$SAVE"
