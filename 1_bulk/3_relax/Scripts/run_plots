@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SAVE="GaN_Etot_vs_a_vs_c-script.dat_70Ry"		
+SAVE="GaN_Etot_vs_a_vs_c-script.dat_50Ry"		
 
 cat > plot-energy-script.gnu <<EOF
 #!/usr/bin/gnuplot

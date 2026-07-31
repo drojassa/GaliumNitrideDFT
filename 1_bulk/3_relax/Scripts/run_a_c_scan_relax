@@ -11,7 +11,7 @@ SCF=GaN.relax.in
 IN=GaN_script.relax.in
 OUT=GaN_script.relax.out
 
-for cutoff in 70; do
+for cutoff in 50; do
 
 SAVE=GaN_Etot_vs_a_vs_c-script.dat_${cutoff}Ry
 SAVEFIT=GaN_Etot_vol-script.dat_${cutoff}Ry

@@ -17,7 +17,7 @@ K= 2.7414
 G2=3.4080
 set xtics ("A" A,"L" L, "M" M, "{/Symbol G}" G,"A" A2,"H" H,"K" K,"{/Symbol G}" G2) nomirror
 set xrange [*:*]
-#set yrange [-13:4]
+set yrange [-8:8]
 set grid x
 set ylabel "Energy (eV)"
 set nokey

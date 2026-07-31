@@ -19,10 +19,10 @@
   ecutwfc   = 70,
   ecutrho   = 700,
   nbnd      = 22,
-  nspin=2
-  occupations='smearing'
-  degauss = 0.001
-  starting_magnetization=0.1
+  !nspin=2
+  occupations='fixed'
+  !degauss = 0.001
+  !starting_magnetization=0.1
 /
 &ELECTRONS
   conv_thr    = 1.D-8,
