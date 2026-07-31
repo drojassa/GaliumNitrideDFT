@@ -1,0 +1,13 @@
+rojassan@vm-nano03:7_Cohesive_Energy$ grep ! *out
+Ga.scf.out:!    total energy              =    -277.73466566 Ry
+GaN.scf.out:!    total energy              =    -612.43184855 Ry
+N.scf.out:!    total energy              =     -27.83661155 Ry
+rojassan@vm-nano03:7_Cohesive_Energy$ bc -l
+bc 1.07.1
+Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type `warranty'. 
+-277.73466566-27.83661155 +612.43184855/2
+.64464706500000000000
+
+

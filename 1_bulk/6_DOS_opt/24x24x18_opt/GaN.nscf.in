@@ -1,6 +1,6 @@
 
 &CONTROL
-    calculation       = 'scf'
+    calculation       = 'nscf'
     restart_mode      = 'from_scratch'
     prefix            = 'GaN'
     tstress           = .true.
@@ -18,7 +18,8 @@
   ntyp      = 2,
   ecutwfc   = 70,
   ecutrho   = 700,
-  nbnd      = 22,
+  nbnd      = 37,
+  occupations='tetrahedra_opt'
 /
 &ELECTRONS
   conv_thr    = 1.D-8,
@@ -33,4 +34,4 @@ ATOMIC_POSITIONS {crystal}
  N 0.333333333 0.666666666 0.376382 0 0 1
  N 0.666666666 0.333333333 0.876382 0 0 1
 K_POINTS {automatic}
-4 4 3 1 1 1
+24 24 18 0 0 0
