@@ -1,0 +1,47 @@
+
+&CONTROL
+    calculation='nscf'
+    prefix='GaN'
+    pseudo_dir="/data-fast/greenano/Students/cohort2/rojassan/Project_GaN/PSEUDO"
+    outdir="./epsilon_GaN_k28x28x21"
+    verbosity='high'
+    wf_collect=.true.
+/
+
+&SYSTEM
+    nosym=.true.
+    noinv=.true.
+
+    ibrav=4,
+    A=3.22,
+    C=5.25,
+
+    nat=4,
+    ntyp=2,
+
+    ecutwfc=70,
+    ecutrho=700,
+
+    nbnd=40,
+/
+
+&ELECTRONS
+    diago_full_acc=.true.
+    diago_thr_init=1.D-10
+    diagonalization='david'
+    conv_thr=1.D-8
+/
+
+ATOMIC_SPECIES
+ Ga 69.723 Ga.upf
+ N 14.007 N.upf
+
+ATOMIC_POSITIONS {crystal}
+ Ga 0.333333333 0.666666666 0.000000
+ Ga 0.666666666 0.333333333 0.500000
+ N 0.333333333 0.666666666 0.376382
+ N 0.666666666 0.333333333 0.876382
+
+K_POINTS {automatic}
+28 28 21 1 1 1
+

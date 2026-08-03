@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+
+source ../../ENVIRONMENT_VARIABLES
+
+echo "BIN_DIR:" $BIN_DIR
+echo "PSEUDO_DIR:" $PSEUDO_DIR
+echo "TMP_DIR:" $TMP_DIR
+echo "Parallel command:" $RUN_COMMAND
+echo "Started at: " `date`
+
+PREFIX="GaN"
+
+#-------------------------------------------------#
+# SCF calculation
+#-------------------------------------------------#
+
+IN_SCF=GaN_script.scf.in
+OUT_SCF=GaN_script.scf.out
+
+cat > $IN_SCF << EOF
+&CONTROL
+    calculation       = 'scf'
+    restart_mode      = 'from_scratch'
+    prefix            = '$PREFIX'
+    tstress           = .true.
+    tprnfor           = .true.
+    pseudo_dir        = "$PSEUDO_DIR"
+    outdir            = "$TMP_DIR"
+    verbosity         = 'high'
+    wf_collect        = .true.
+/
+
+&SYSTEM
+    ibrav     = 4,
+    A         = 3.22,
+    C         = 5.25,
+    nat       = 4,
+    ntyp      = 2,
+    ecutwfc   = 70,
+    ecutrho   = 700,
+    nbnd      = 40,
+/
+
+&ELECTRONS
+    conv_thr    = 1.D-8,
+    mixing_beta = 0.7D0,
+/
+
+ATOMIC_SPECIES
+ Ga 69.723 Ga.upf
+ N  14.007 N.upf
+
+ATOMIC_POSITIONS {crystal}
+ Ga 0.333333333 0.666666666 0.000000
+ Ga 0.666666666 0.333333333 0.500000
+ N  0.333333333 0.666666666 0.376382
+ N  0.666666666 0.333333333 0.876382
+
+K_POINTS {automatic}
+4 4 3 1 1 1
+EOF
+
+echo "Running SCF..."
+
+COMMAND="$RUN_COMMAND $BIN_DIR/pw.x"
+
+$COMMAND < $IN_SCF > $OUT_SCF
+
+#-------------------------------------------------#
+# NSCF + epsilon.x
+#-------------------------------------------------#
+
+for klist in \
+"20 20 15" \
+"24 24 18" \
+"28 28 21" \
+"32 32 24" 
+do
+
+kx=$(echo $klist | awk '{print $1}')
+ky=$(echo $klist | awk '{print $2}')
+kz=$(echo $klist | awk '{print $3}')
+
+echo "K-grid = $kx x $ky x $kz"
+
+TMP_OPT="./epsilon_GaN_k${kx}x${ky}x${kz}"
+
+mkdir -p $TMP_OPT
+
+cp -r $TMP_DIR/$PREFIX.* $TMP_OPT/
+
+IN=GaN_script.nscf.in
+OUT=GaN_script.nscf.out_k${kx}x${ky}x${kz}
+
+cat > $IN << EOF
+
+&CONTROL
+    calculation='nscf'
+    prefix='$PREFIX'
+    pseudo_dir="$PSEUDO_DIR"
+    outdir="$TMP_OPT"
+    verbosity='high'
+    wf_collect=.true.
+/
+
+&SYSTEM
+    nosym=.true.
+    noinv=.true.
+
+    ibrav=4,
+    A=3.22,
+    C=5.25,
+
+    nat=4,
+    ntyp=2,
+
+    ecutwfc=70,
+    ecutrho=700,
+
+    nbnd=40,
+/
+
+&ELECTRONS
+    diago_full_acc=.true.
+    diago_thr_init=1.D-10
+    diagonalization='david'
+    conv_thr=1.D-8
+/
+
+ATOMIC_SPECIES
+ Ga 69.723 Ga.upf
+ N 14.007 N.upf
+
+ATOMIC_POSITIONS {crystal}
+ Ga 0.333333333 0.666666666 0.000000
+ Ga 0.666666666 0.333333333 0.500000
+ N 0.333333333 0.666666666 0.376382
+ N 0.666666666 0.333333333 0.876382
+
+K_POINTS {automatic}
+$kx $ky $kz 1 1 1
+
+EOF
+
+COMMAND="$RUN_COMMAND $BIN_DIR/pw.x -npool 4"
+
+$COMMAND < $IN > $OUT
+
+mv $IN $OUT $TMP_OPT
+
+#-------------------------------------------------#
+# epsilon.x
+#-------------------------------------------------#
+
+IN_EPS=GaN_script.epsilon.in
+OUT_EPS=GaN_script.epsilon.out
+
+cat > $IN_EPS << EOF
+
+&inputpp
+    calculation="eps"
+    prefix="$PREFIX"
+    outdir="$TMP_OPT"
+/
+
+&energy_grid
+    smeartype="gauss"
+    intersmear=0.1
+    wmin=0.05
+    wmax=20.05
+    nw=2001
+/
+
+EOF
+
+COMMAND="$RUN_COMMAND $BIN_DIR/epsilon.x"
+
+$COMMAND < $IN_EPS > $OUT_EPS
+
+mv $IN_EPS $OUT_EPS $TMP_OPT
+
+mv *.dat $TMP_OPT
+
+done
+
+echo "Finished at: " `date`

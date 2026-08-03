@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+source ../../ENVIRONMENT_VARIABLES
+
+echo "BIN_DIR:" $BIN_DIR
+echo "PSEUDO_DIR:" $PSEUDO_DIR
+echo "TMP_DIR:" $TMP_DIR
+echo "Parallel command:" $RUN_COMMAND
+echo "Started at: " `date`
+
+# File where energies will be stored
+SAVE=Etot_vs_Ecut.dat
+
+echo -e "# Ecut(Ry)\tEnergy(Ry)" > $SAVE
+
+
+# Sweep over cutoff energies
+for ecut in 20 30 40 50 60 70 80 90 100; do
+
+IN=GaN_Ecut${ecut}.scf.in
+OUT=GaN_Ecut${ecut}.scf.out
+
+
+cat > $IN << EOF
+
+&CONTROL
+    calculation       = 'scf'
+    restart_mode      = 'from_scratch'
+    prefix            = 'GaN'
+    tstress           = .true.
+    tprnfor           = .true.
+    pseudo_dir        = "$PSEUDO_DIR"
+    outdir            = "$TMP_DIR"
+    verbosity         = 'high'
+    wf_collect        = .true.
+/
+
+&SYSTEM
+    ibrav     = 4,
+    A         = 3.22,
+    C         = 5.25,
+    nat       = 4,
+    ntyp      = 2,
+    ecutwfc   = $ecut,
+    nbnd      = 22,
+/
+
+&ELECTRONS
+    conv_thr    = 1.D-8,
+    mixing_beta = 0.7D0,
+/
+
+ATOMIC_SPECIES
+ Ga  69.723  Ga.upf
+ N   14.007  N.upf
+
+ATOMIC_POSITIONS {crystal}
+ Ga 0.333333333 0.666666666 0.000000 0 0 0
+ Ga 0.666666666 0.333333333 0.500000 0 0 0
+ N  0.333333333 0.666666666 0.376382 0 0 1
+ N  0.666666666 0.333333333 0.876382 0 0 1
+
+K_POINTS {automatic}
+4 4 3 1 1 1
+
+EOF
+
+
+echo -e "\tStart calculation with ecut = $ecut Ry"
+echo -e "\tStarted: " `date`
+
+COMMAND="$RUN_COMMAND $BIN_DIR/pw.x"
+
+echo -e "\t$COMMAND < $IN > $OUT"
+
+$COMMAND < $IN > $OUT
+
+
+echo -e "\tFinished: " `date`
+
+
+# Extract total energy
+ENERGY=$(grep "!" $OUT | tr -dc '0-9,-.')
+
+echo -e "$ecut\t$ENERGY" >> $SAVE
+
+
+done
+
+
+echo "Run completed at: " `date`

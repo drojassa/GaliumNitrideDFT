@@ -4,7 +4,7 @@
 #By default the code will run in serial.
 #RUN_COMMAND=""
 #For running in parallel, uncomment the following line (remove the first # symbol)
-RUN_COMMAND="mpirun -np 8"
+RUN_COMMAND="mpirun -np 12"
 
 
 #

@@ -1,0 +1,15 @@
+
+&inputpp
+    calculation="eps"
+    prefix="GaN"
+    outdir="./epsilon_GaN_k16x16x12"
+/
+
+&energy_grid
+    smeartype="gauss"
+    intersmear=0.1
+    wmin=0.05
+    wmax=20.05
+    nw=2001
+/
+

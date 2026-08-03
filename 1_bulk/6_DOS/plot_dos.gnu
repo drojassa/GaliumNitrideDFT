@@ -1,7 +1,7 @@
 reset
 
 set terminal pngcairo enhanced size 900,600
-set output "DOS_comparacion.png"
+set output "DOS_kpoints.png"
 
 set title "DOS using tetrahedron method"
 
@@ -24,4 +24,5 @@ plot \
 '4x4x3_tetra/GaN.dos.dat'     using ($1-EF):2 with lines lw 2 title '4x4x3', \
 '8x8x6_tetra/GaN.dos.dat'     using ($1-EF):2 with lines lw 2 title '8x8x6', \
 '16x16x12_tetra/GaN.dos.dat'  using ($1-EF):2 with lines lw 2 title '16x16x12', \
-'24x24x18_tetra/GaN.dos.dat'  using ($1-EF):2 with lines lw 2 title '24x24x18'
+'24x24x18_tetra/GaN.dos.dat'  using ($1-EF):2 with lines lw 2 title '24x24x18', \
+'32x32x24_tetra/GaN.dos.dat'  using ($1-EF):2 with lines lw 2 title '32x32x24'
