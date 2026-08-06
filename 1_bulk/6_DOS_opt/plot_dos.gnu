@@ -3,7 +3,7 @@ reset
 set terminal pngcairo enhanced size 900,600
 set output "DOS_comparacion.png"
 
-set title "DOS using tetrahedron method"
+set title "DOS using tetrahedron optimized method"
 
 set xlabel "Energy - E_F (eV)"
 set ylabel "DOS (states/eV)"
