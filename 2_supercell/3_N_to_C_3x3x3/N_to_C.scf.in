@@ -17,6 +17,9 @@
   ecutwfc   = 70,
   ecutrho   = 700,
   nbnd      = 513,
+  occupations = 'smearing' ,
+  degauss = 0.005 ,
+  smearing = 'gaussian' ,
 /
 &ELECTRONS
   conv_thr    = 1.D-8,
