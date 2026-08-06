@@ -33,7 +33,7 @@ set lmargin at screen 0.63
 set rmargin at screen 0.95
 unset grid 
 set grid y
-set xrange [0:4.5]
+set xrange [0:5]
 plot "GaN.dos.dat" u 2:($1-VBM) with filledcurves y1 lc "red" fc "red"
 set nomulti
 replot
