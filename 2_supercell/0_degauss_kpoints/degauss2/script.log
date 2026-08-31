@@ -1,0 +1,13 @@
+nohup: ignoring input
+BIN_DIR: /data-fast/greenano/Software/qe-7.3.1-ifx-local/bin
+PSEUDO_DIR: /data-fast/greenano/Students/cohort2/rojassan/Project_GaN/PSEUDO
+TMP_DIR: ./tmp
+Parallel command: mpirun -np 12
+Started at:  Sun Aug 30 07:25:06 CEST 2026
+K-grid = 2 x 2 x 2
+		  mpirun -np 12 /data-fast/greenano/Software/qe-7.3.1-ifx-local/bin/pw.x < script222.scf.in > script222.scf.out
+K-grid = 3 x 3 x 2
+		  mpirun -np 12 /data-fast/greenano/Software/qe-7.3.1-ifx-local/bin/pw.x < script332.scf.in > script332.scf.out
+K-grid = 4 x 4 x 2
+		  mpirun -np 12 /data-fast/greenano/Software/qe-7.3.1-ifx-local/bin/pw.x < script442.scf.in > script442.scf.out
+Finished at:  Sun Aug 30 11:45:06 CEST 2026

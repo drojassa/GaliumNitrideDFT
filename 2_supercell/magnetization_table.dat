@@ -1,0 +1,10 @@
+degauss       2x2x2     3x3x2     4x4x2
+----------------------------------------
+0.001          1.00      0.79      0.33
+0.002          0.99      0.80      0.00
+0.004          1.00      0.74     -0.00
+0.008          0.02     -0.00      0.00
+
+Total magnetization (Bohr mag/cell)
+* = run did not finish (no JOB DONE): value not reliable
+n/a = file missing
