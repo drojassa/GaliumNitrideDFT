@@ -24,8 +24,8 @@
   occupations = 'tetrahedra',
 /
 &ELECTRONS
-  conv_thr    = 1.D-8,
-  mixing_beta = 0.7D0	,
+  conv_thr      = 1.0D-6
+  diago_david_ndim = 4
 /
 ATOMIC_SPECIES
  Ga  69.723  Ga.pbe-dn-kjpaw_psl.1.0.0.UPF
